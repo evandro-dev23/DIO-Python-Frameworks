@@ -1,0 +1,66 @@
+from sqlalchemy import create_engine
+from sqlalchemy import MetaData
+from sqlalchemy import Table 
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Session
+
+# Criando a conexão com o SQLite
+engine = create_engine('sqlite:///:memory:', echo=True)
+
+# Declarando a classe base para as tabelas
+Base = declarative_base()
+
+# Definindo a classe Cliente
+class Cliente(Base):
+	__tablename__ = 'clientes'
+
+	id = Column(Integer, primary_key=True)
+	nome = Column(String)
+	contas = relationship('Conta', back_populates='cliente')
+
+# Definindo a classe Conta
+class Conta(Base):
+	__tablename__ = 'contas'
+
+	id = Column(Integer, primary_key=True)
+	numero = Column(String)
+	saldo = Column(Integer)
+	cliente_id = Column(Integer, ForeignKey('clientes.id'))
+	cliente = relationship('Cliente', back_populates='contas')
+
+# Criando as tabelas no banco de dados
+Base.metadata.create_all(engine)
+
+# Criando uma sessão para interagir com o banco de dados
+session = Session(engine)
+
+# Inserindo dados mínimos
+cliente1 = Cliente(nome='João')
+conta1 = Conta(numero='12345', saldo=1000, cliente=cliente1)
+
+cliente2 = Cliente(nome='Maria')
+conta2 = Conta(numero='54321', saldo=500, cliente=cliente2)
+
+session.add_all([cliente1, conta1, cliente2, conta2])
+session.commit()
+
+# Executando métodos de recuperação de dados
+clientes = session.query(Cliente).all()
+contas = session.query(Conta).all()
+
+# Exibindo os resultados
+print("Clientes:")
+for cliente in clientes:
+	print(f"ID: {cliente.id}, Nome: {cliente.nome}")
+
+print("\nContas:")
+for conta in contas:
+	print(f"ID: {conta.id}, Número: {conta.numero}, Saldo: {conta.saldo}, Cliente: {conta.cliente.nome}")
+
+# Fechando a sessão
+session.close()
