@@ -1,0 +1,20 @@
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+# Dados da planilha
+dados = [
+    {"Número": 1, "Nome": "Maria", "Idade": 25, "Cidade": "Fortaleza", "País": "Brasil"},
+    {"Número": 2, "Nome": "João", "Idade": 45, "Cidade": "Fortaleza", "País": "Brasil"},
+    {"Número": 3, "Nome": "Claudio", "Idade": 29, "Cidade": "Fortaleza", "País": "Brasil"},
+    {"Número": 4, "Nome": "Rebeca", "Idade": None, "Cidade": "Fortaleza", "País": "Brasil"},
+    {"Número": 5, "Nome": "Roberto", "Idade": None, "Cidade": "Fortaleza", "País": "Brasil"}
+]
+
+# Rota para retornar a planilha em formato JSON
+@app.route('/index')
+def index():
+    return jsonify(dados)
+
+if __name__ == '__main__':
+    app.run()
